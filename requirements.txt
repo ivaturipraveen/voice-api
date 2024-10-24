@@ -1,5 +1,4 @@
 Flask
-gTTS
+gtts
 SpeechRecognition
 pydub
-pyaudio
