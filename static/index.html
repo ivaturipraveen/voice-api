@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TTS and STT API Tester</title>
+  </head>
+  <body>
+    <h1>TTS and STT API Tester</h1>
+
+    <div>
+      <h2>Text-to-Speech (TTS)</h2>
+      <form id="tts-form">
+        <label for="text">Enter Text:</label>
+        <input type="text" id="text" name="text" required />
+        <button type="submit">Convert to Speech</button>
+      </form>
+      <audio id="tts-audio" controls></audio>
+    </div>
+
+    <div>
+      <h2>Speech-to-Text (STT)</h2>
+      <form id="stt-form" enctype="multipart/form-data">
+        <label for="audio">Upload Audio File:</label>
+        <input type="file" id="audio" name="audio" accept="audio/*" required />
+        <button type="submit">Convert to Text</button>
+      </form>
+      <div id="stt-result"></div>
+    </div>
+
+    <script>
+      document
+        .getElementById("tts-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const text = document.getElementById("text").value;
+
+          const response = await fetch("/tts", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ text }),
+          });
+
+          const blob = await response.blob();
+          const audio = document.getElementById("tts-audio");
+          audio.src = URL.createObjectURL(blob);
+          audio.play();
+        });
+
+      document
+        .getElementById("stt-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const formData = new FormData();
+          const fileInput = document.getElementById("audio");
+          formData.append("file", fileInput.files[0]);
+
+          const response = await fetch("/stt", {
+            method: "POST",
+            body: formData,
+          });
+
+          const result = await response.json();
+          document.getElementById("stt-result").textContent =
+            result.text || result.error;
+        });
+    </script>
+  </body>
+</html>
