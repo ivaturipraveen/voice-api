@@ -6,9 +6,10 @@ import io
 from flask_cors import CORS
 
 app = Flask(__name__)
+# Simplified CORS configuration
 CORS(app, resources={
     r"/*": {
-        "origins": "*",
+        "origins": ["http://localhost:5173"],  # Add your frontend URL
         "methods": ["GET", "POST", "OPTIONS"],
         "allow_headers": ["Content-Type", "Accept"]
     }
@@ -26,11 +27,8 @@ def home():
     })
 
 # Text-to-Speech (TTS) route
-@app.route('/tts', methods=['POST', 'OPTIONS'])
+@app.route('/tts', methods=['POST'])
 def tts():
-    if request.method == 'OPTIONS':
-        return make_response('', 204)
-
     try:
         data = request.get_json()
         if not data or 'text' not in data:
@@ -51,17 +49,12 @@ def tts():
         audio_io.seek(0)
         
         # Create the response
-        response = make_response(send_file(
+        response = send_file(
             audio_io,
             mimetype='audio/mpeg',
             as_attachment=True,
             download_name='speech.mp3'
-        ))
-        
-        # Add CORS headers
-        response.headers['Access-Control-Allow-Origin'] = '*'
-        response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
-        response.headers['Content-Type'] = 'audio/mpeg'
+        )
         
         return response
 
@@ -95,13 +88,6 @@ def stt():
         return jsonify({'error': 'Could not request results from Google Speech Recognition service'}), 500
     except Exception as e:
         return jsonify({'error': f'STT conversion failed: {str(e)}'}), 500
-
-@app.after_request
-def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-    return response
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
