@@ -6,6 +6,17 @@ import io
 
 app = Flask(__name__)
 
+# Root route for basic information
+@app.route('/')
+def home():
+    return jsonify({
+        "message": "Welcome to the Text-to-Speech and Speech-to-Text API!",
+        "endpoints": {
+            "/tts": "POST with JSON payload { 'text': 'Your text here' } for text-to-speech conversion.",
+            "/stt": "POST with an audio file for speech-to-text conversion."
+        }
+    })
+
 # Text-to-Speech (TTS) route
 @app.route('/tts', methods=['POST'])
 def tts():
