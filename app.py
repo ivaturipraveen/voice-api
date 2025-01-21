@@ -3,8 +3,10 @@ from gtts import gTTS
 import os
 import speech_recognition as sr
 import io
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app) 
 
 # Root route for basic information
 @app.route('/')
