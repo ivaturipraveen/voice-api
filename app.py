@@ -6,11 +6,6 @@ import io
 
 app = Flask(__name__)
 
-# Route to serve the HTML page
-@app.route('/')
-def index():
-    return send_file('index.html')
-
 # Text-to-Speech (TTS) route
 @app.route('/tts', methods=['POST'])
 def tts():
@@ -52,4 +47,5 @@ def stt():
         return jsonify({'error': 'Could not request results from Google Speech Recognition service'}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=os.environ.get('PORT', 5000))
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
